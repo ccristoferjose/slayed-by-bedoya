@@ -1,0 +1,87 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  # Lets you re-publish from the Actions tab without pushing a commit —
+  # useful after changing a repository variable.
+  workflow_dispatch:
+
+# Least privilege: read the repo, publish a Pages deployment, and mint the
+# OIDC token that deploy-pages uses to prove the artifact came from this run.
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Never let two deploys race. Queue rather than cancel, so a push that lands
+# mid-deploy still ends up published.
+concurrency:
+  group: github-pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    env:
+      # Deployment shape, not secret. A GitHub Pages *project* site is served
+      # from /<repo>, so the app needs to know that prefix at build time.
+      NEXT_PUBLIC_BASE_PATH: /slayed-by-bedoya
+      NEXT_PUBLIC_SITE_URL: https://ccristoferjose.github.io/slayed-by-bedoya
+
+      # NEXT_PUBLIC_* values are inlined into client-side JavaScript, so they
+      # are public by nature. Set them as repository VARIABLES, not Secrets:
+      #   Settings -> Secrets and variables -> Actions -> Variables tab
+      # Any left unset fall back to the defaults in lib/site.ts.
+      NEXT_PUBLIC_WHATSAPP_NUMBER: ${{ vars.NEXT_PUBLIC_WHATSAPP_NUMBER }}
+      NEXT_PUBLIC_INSTAGRAM_HANDLE: ${{ vars.NEXT_PUBLIC_INSTAGRAM_HANDLE }}
+      NEXT_PUBLIC_LOCATION: ${{ vars.NEXT_PUBLIC_LOCATION }}
+      NEXT_PUBLIC_CONTACT_EMAIL: ${{ vars.NEXT_PUBLIC_CONTACT_EMAIL }}
+      NEXT_PUBLIC_GA_ID: ${{ vars.NEXT_PUBLIC_GA_ID }}
+
+    steps:
+      - name: Check out
+        uses: actions/checkout@v5
+
+      - name: Set up Node
+        uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      # `prebuild` regenerates the responsive WebP variants, so adding real
+      # photography needs no extra step beyond committing the source image.
+      - name: Build static export
+        run: npm run build
+
+      - name: Check for placeholder content
+        run: |
+          if grep -rqF "wa.me/15555550123" out; then
+            echo "::warning title=Placeholder WhatsApp number::The site was built with the placeholder number 15555550123. Set the NEXT_PUBLIC_WHATSAPP_NUMBER repository variable, then re-run this workflow."
+          fi
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v6
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: out
+          # public/.nojekyll is a dotfile, and this action strips dotfiles by
+          # default — without this it would be silently dropped from the upload.
+          include-hidden-files: true
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5

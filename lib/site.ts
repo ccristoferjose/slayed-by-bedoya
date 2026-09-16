@@ -8,6 +8,18 @@
  * ─────────────────────────────────────────────────────────────
  */
 
+/**
+ * Reads a public env var, treating an empty or whitespace-only value as unset.
+ *
+ * This matters in CI: an unset GitHub Actions variable is injected as `""`,
+ * not as undefined, so `??` alone would accept the empty string and ship a
+ * site with no WhatsApp number and no canonical URL.
+ */
+function env(value: string | undefined, fallback: string): string {
+  const trimmed = value?.trim();
+  return trimmed ? trimmed : fallback;
+}
+
 export const site = {
   name: "Slayed by Bedoya",
   shortName: "Bedoya",
@@ -18,23 +30,33 @@ export const site = {
    * No `+`, no spaces, no dashes. Example: 13105550147
    * PLACEHOLDER — set NEXT_PUBLIC_WHATSAPP_NUMBER in .env.local
    */
-  whatsappNumber: process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? "15555550123",
+  whatsappNumber: env(process.env.NEXT_PUBLIC_WHATSAPP_NUMBER, "15555550123"),
 
   /** Instagram handle without the `@`. PLACEHOLDER */
-  instagramHandle: process.env.NEXT_PUBLIC_INSTAGRAM_HANDLE ?? "slayedbybedoya",
+  instagramHandle: env(process.env.NEXT_PUBLIC_INSTAGRAM_HANDLE, "slayedbybedoya"),
 
   /** Displayed service area. PLACEHOLDER */
-  location: process.env.NEXT_PUBLIC_LOCATION ?? "New York, NY",
+  location: env(process.env.NEXT_PUBLIC_LOCATION, "New York, NY"),
 
   /** Optional. Leave empty and the email link is simply not rendered. */
-  email: process.env.NEXT_PUBLIC_CONTACT_EMAIL ?? "",
+  email: env(process.env.NEXT_PUBLIC_CONTACT_EMAIL, ""),
 
   /** Canonical origin, used for metadata and the sitemap. */
-  url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://slayedbybedoya.com",
+  url: env(process.env.NEXT_PUBLIC_SITE_URL, "https://slayedbybedoya.com"),
 
   /** GA4 measurement ID. Leave empty to disable analytics entirely. */
-  gaId: process.env.NEXT_PUBLIC_GA_ID ?? "",
+  gaId: env(process.env.NEXT_PUBLIC_GA_ID, ""),
 } as const;
+
+/**
+ * Base path the site is served under — "/slayed-by-bedoya" on a GitHub Pages
+ * project site, "" at a domain root. Any trailing slash is stripped so callers
+ * can always concatenate `${basePath}/foo`.
+ */
+export const basePath = env(process.env.NEXT_PUBLIC_BASE_PATH, "").replace(/\/+$/, "");
+
+/** Canonical origin with any trailing slash removed, for safe concatenation. */
+export const siteUrl = site.url.replace(/\/+$/, "");
 
 export const instagramUrl = `https://instagram.com/${site.instagramHandle}`;
 

@@ -24,6 +24,7 @@ is never hard-coded anywhere else — every WhatsApp link on the site is
 generated from this one value.
 
 ```bash
+NEXT_PUBLIC_BASE_PATH=                     # blank locally; CI sets it for Pages
 NEXT_PUBLIC_WHATSAPP_NUMBER=13105550147   # international format, digits only
 NEXT_PUBLIC_INSTAGRAM_HANDLE=slayedbybedoya
 NEXT_PUBLIC_LOCATION=New York
@@ -94,7 +95,16 @@ lib/
   faq.ts          FAQ content
   metadata.ts     per-page metadata and local-business JSON-LD
   analytics.ts    GA4 event helper; no-ops when GA isn't configured
-scripts/      placeholder image generator and its manifest
+  image-loader.ts custom next/image loader for the static export
+  image-manifest.ts  GENERATED — which widths exist for each image
+config/
+  image-sizes.json   widths shared by the generator and next.config.ts
+scripts/
+  generate-placeholders.mjs  builds the stand-in photography
+  placeholder-manifest.mjs   the image slot list
+  optimize-images.mjs        pre-renders responsive WebP variants
+.github/workflows/
+  deploy.yml    builds and publishes to GitHub Pages on push to main
 ```
 
 Adding a service means adding an object to `lib/services.ts` — the services
@@ -123,21 +133,120 @@ services actually generate enquiries and where people tap from.
 
 ## Notes on the build
 
-- Every route is static. No server runtime is required beyond image
-  optimisation.
+- Every route is static, exported to plain HTML/CSS/JS. No server runtime at
+  all — image sizes are pre-rendered at build time.
 - Server Components by default; only the navbar, mobile menu, floating button,
   gallery, and social row are client components.
 - Fonts are self-hosted through `next/font` (Cormorant Garamond, Inter) — no
   render-blocking request to Google.
+- Images are served as pre-rendered WebP with a full `srcset`; see
+  *Images without a server* above.
 - Colour contrast meets WCAG AA throughout; `--color-stone` is reserved for
   display numerals 24px and up, which is documented in `app/globals.css`.
 - Scroll reveals are guarded by `@media (scripting: enabled)`, so the site is
   fully readable if JavaScript fails.
 
-## Deploy
+## Deploying to GitHub Pages
 
-Push to Vercel and set the same environment variables in the project settings.
+Pushing to `main` builds and publishes automatically via
+`.github/workflows/deploy.yml`. The live URL is:
+
+**https://ccristoferjose.github.io/slayed-by-bedoya/**
+
+### One-time setup
+
+1. **Enable Pages with Actions as the source.**
+   Repo -> Settings -> Pages -> *Build and deployment* -> Source:
+   **GitHub Actions**. (Not "Deploy from a branch".)
+
+2. **Add your real values as repository _Variables_.**
+   Repo -> Settings -> Secrets and variables -> Actions -> **Variables** tab:
+
+   | Variable | Example |
+   | --- | --- |
+   | `NEXT_PUBLIC_WHATSAPP_NUMBER` | `13105550147` |
+   | `NEXT_PUBLIC_INSTAGRAM_HANDLE` | `slayedbybedoya` |
+   | `NEXT_PUBLIC_LOCATION` | `New York, NY` |
+   | `NEXT_PUBLIC_CONTACT_EMAIL` | *(optional, leave unset to hide)* |
+   | `NEXT_PUBLIC_GA_ID` | *(optional, `G-XXXXXXXXXX`)* |
+
+   Use **Variables**, not Secrets. Every `NEXT_PUBLIC_*` value is compiled into
+   the JavaScript the browser downloads, so none of them are secret — and
+   Secrets get masked in build logs, which only makes debugging harder.
+
+   Anything you leave unset falls back to the placeholder defaults in
+   `lib/site.ts`. The workflow prints a warning in the Actions summary if the
+   site ships with the placeholder WhatsApp number still in it.
+
+3. **Push to `main`.** Or run the workflow by hand from the Actions tab —
+   useful after changing a variable, since variables only take effect on a new
+   build.
+
+### Why this needs a build step
+
+GitHub Pages serves static files only. `next.config.ts` sets
+`output: "export"`, so `next build` writes a complete static site to `out/`
+and the workflow uploads that directory. Every route is prerendered to HTML,
+so nothing is lost — there is no server-rendered content on this site.
+
+Two consequences worth knowing about:
+
+- **`basePath`.** A Pages *project* site is served from `/slayed-by-bedoya`,
+  not the domain root. The workflow sets `NEXT_PUBLIC_BASE_PATH` so Next
+  prefixes every link, script, stylesheet, and font. `next/image` is the one
+  exception — it does *not* prefix `src` — which is handled centrally in
+  `lib/image-loader.ts` rather than in the ~50 image references.
+- **`trailingSlash: true`.** Routes export as `about/index.html` rather than
+  `about.html`, which GitHub Pages resolves unambiguously. Canonical URLs and
+  `sitemap.xml` are generated with matching trailing slashes.
+
+### Images without a server
+
+`next/image`'s on-demand optimizer needs a running server, which Pages doesn't
+have. Instead the sizes are pre-rendered at build time:
+
+```
+public/images/hero.jpg          <- you commit this (the real photograph)
+        | npm run build  ->  scripts/optimize-images.mjs
+public/images/_opt/hero-640.webp
+public/images/_opt/hero-828.webp
+public/images/_opt/hero-1080.webp   ...and so on
+```
+
+`lib/image-loader.ts` maps each width `next/image` asks for onto one of those
+files, so you keep real `srcset`, lazy loading, and WebP — a phone downloads
+the 640px variant, not the full-resolution original.
+
+This runs automatically on `npm run dev` and `npm run build` (via `predev` /
+`prebuild`) and is incremental, so only changed images are re-encoded. **Drop
+in real photography and commit only the source file** — `public/images/_opt/`
+is generated and gitignored.
+
+The widths live in `config/image-sizes.json`, which both the generator and
+`next.config.ts` read, so the two cannot drift apart.
+
+### Reproducing the deployed build locally
 
 ```bash
-npm run build && npm start   # to check the production build locally
+NEXT_PUBLIC_BASE_PATH=/slayed-by-bedoya \
+NEXT_PUBLIC_SITE_URL=https://ccristoferjose.github.io/slayed-by-bedoya \
+npm run build
 ```
+
+To preview the plain root build instead:
+
+```bash
+npm run build && npm run preview     # serves out/ at http://localhost:3000
+```
+
+Note that `next start` no longer applies — a static export has no server to
+start.
+
+### Moving to a custom domain later
+
+1. Create `public/CNAME` containing just the domain, e.g. `slayedbybedoya.com`.
+2. In `.github/workflows/deploy.yml`, set `NEXT_PUBLIC_BASE_PATH:` to empty and
+   `NEXT_PUBLIC_SITE_URL:` to `https://slayedbybedoya.com`.
+3. Point DNS at GitHub Pages and set the domain under Settings -> Pages.
+
+Nothing else changes — the base path is read from that one variable.

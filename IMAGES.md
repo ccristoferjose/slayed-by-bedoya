@@ -15,6 +15,12 @@ holds a generated warm-neutral placeholder.
 
 Nothing else needs to change. No paths are hard-coded anywhere else.
 
+**Commit only the source file.** `npm run build` (and `npm run dev`) runs
+`scripts/optimize-images.mjs`, which pre-renders responsive WebP variants into
+`public/images/_opt/` for the static GitHub Pages export. That directory is
+generated and gitignored — never edit or commit it. See *Images without a
+server* in the README.
+
 ## Regenerating placeholders
 
 ```bash
