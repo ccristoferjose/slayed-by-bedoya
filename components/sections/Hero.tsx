@@ -14,7 +14,6 @@ export function Hero() {
         // The LCP element — preloaded in <head> rather than discovered in <body>.
         preload
         sizes="100vw"
-        quality={75}
         className="object-cover object-center"
       />
 
