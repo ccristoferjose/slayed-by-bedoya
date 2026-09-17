@@ -36,6 +36,12 @@ readers and to search engines. Write what the makeup actually looks like
 ("soft glam with a luminous complexion and warm bronze eyes"), not
 "makeup photo 4".
 
+## The hero video
+
+`hero.jpg` is still required — it is the video's poster and its fallback. The
+video itself is encoded separately from `media-src/hero.mp4`; see *The hero
+video* in the README.
+
 ## The slots
 
 | File | Pixels | Ratio | Intended shot |

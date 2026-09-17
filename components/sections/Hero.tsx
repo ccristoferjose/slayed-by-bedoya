@@ -3,6 +3,7 @@ import Link from "next/link";
 import { site } from "@/lib/site";
 import { whatsappMessages } from "@/lib/whatsapp";
 import { WhatsAppButton } from "@/components/ui/WhatsAppButton";
+import { HeroVideo } from "./HeroVideo";
 
 export function Hero() {
   return (
@@ -12,10 +13,13 @@ export function Hero() {
         alt="Editorial beauty portrait by Slayed by Bedoya"
         fill
         // The LCP element — preloaded in <head> rather than discovered in <body>.
+        // It also doubles as the video's poster and its permanent fallback.
         preload
         sizes="100vw"
         className="object-cover object-center"
       />
+
+      <HeroVideo />
 
       {/* Scrim: keeps the wordmark legible at the top and the copy legible at
           the bottom without washing the photograph out in the middle. */}
