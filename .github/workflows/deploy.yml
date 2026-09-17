@@ -27,8 +27,8 @@ jobs:
     env:
       # Deployment shape, not secret. A GitHub Pages *project* site is served
       # from /<repo>, so the app needs to know that prefix at build time.
-      NEXT_PUBLIC_BASE_PATH: /slayed-by-bedoya
-      NEXT_PUBLIC_SITE_URL: https://ccristoferjose.github.io/slayed-by-bedoya
+      NEXT_PUBLIC_BASE_PATH: ""
+      NEXT_PUBLIC_SITE_URL: https://slayedbybedoya.com
 
       # NEXT_PUBLIC_* values are inlined into client-side JavaScript, so they
       # are public by nature. Set them as repository VARIABLES, not Secrets:
