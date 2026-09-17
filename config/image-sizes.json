@@ -1,0 +1,6 @@
+{
+  "_comment": "Widths next/image may request. scripts/optimize-images.mjs pre-renders a WebP at each of these (skipping any wider than the source), and lib/image-loader.ts maps requests onto them. Both read THIS file, so the two can never drift apart.",
+  "deviceSizes": [640, 828, 1080, 1440, 1920],
+  "imageSizes": [256, 384],
+  "quality": 78
+}

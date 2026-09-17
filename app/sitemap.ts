@@ -1,6 +1,17 @@
 import type { MetadataRoute } from "next";
 import { detailPageServices } from "@/lib/services";
-import { site } from "@/lib/site";
+import { siteUrl } from "@/lib/site";
+
+// Required by `output: "export"` — emits a static sitemap.xml at build time.
+export const dynamic = "force-static";
+
+/**
+ * `trailingSlash: true` is set for GitHub Pages, so the canonical form of every
+ * URL ends in a slash. The sitemap must match what the pages declare, or search
+ * engines see two URLs for one page.
+ */
+const canonical = (path: string) =>
+  `${siteUrl}${path === "/" ? "/" : `${path}/`}`;
 
 const staticRoutes: { path: string; priority: number }[] = [
   { path: "/", priority: 1 },
@@ -23,13 +34,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   return [
     ...staticRoutes.map(({ path, priority }) => ({
-      url: `${site.url}${path}`,
+      url: canonical(path),
       lastModified,
       changeFrequency: "monthly" as const,
       priority,
     })),
     ...detailPageServices.map((service) => ({
-      url: `${site.url}/services/${service.slug}`,
+      url: canonical(`/services/${service.slug}`),
       lastModified,
       changeFrequency: "monthly" as const,
       priority: 0.8,

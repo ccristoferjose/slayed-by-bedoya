@@ -13,7 +13,6 @@ export function BridalHero() {
         fill
         preload
         sizes="100vw"
-        quality={75}
         className="object-cover object-center"
       />
       <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-b from-ink/55 via-ink/15 to-ink/80" />
