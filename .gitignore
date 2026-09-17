@@ -44,3 +44,7 @@ next-env.d.ts
 
 # generated responsive image variants (rebuilt by `npm run build` / `npm run dev`)
 /public/images/_opt/
+/.image-cache.json
+
+# original un-encoded video sources (large; encode with scripts/encode-hero-video.mjs)
+/media-src/

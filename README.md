@@ -242,6 +242,43 @@ npm run build && npm run preview     # serves out/ at http://localhost:3000
 Note that `next start` no longer applies — a static export has no server to
 start.
 
+### The hero video
+
+The homepage hero plays a muted, looping background video over the static
+`hero.jpg`, which remains the poster, the LCP element, and the fallback.
+
+```
+media-src/hero.mp4                  your original (gitignored, never served)
+        | node scripts/encode-hero-video.mjs
+public/images/hero-desktop.mp4      1580x1010 landscape, >= 768px   (committed)
+public/images/hero-mobile.mp4        620x1010 portrait,   < 768px   (committed)
+```
+
+The video is requested only after the first paint, and **not at all** when the
+visitor prefers reduced motion, has Data Saver on, or has JavaScript disabled.
+Those visitors see the photograph, which is what everyone sees first regardless.
+
+Two files because the hero is full-bleed with `object-cover`: on a portrait
+phone a landscape clip loses roughly three quarters of its width. The mobile
+file is a pre-cropped centre slice, so the subject stays framed and the
+download is smaller.
+
+To swap in new footage: drop it at `media-src/hero.mp4` and run
+
+```bash
+node scripts/encode-hero-video.mjs                    # uses the default crop
+node scripts/encode-hero-video.mjs --crop none        # for clean source footage
+node scripts/encode-hero-video.mjs --crop 1580:1010:180:0
+```
+
+The default crop trims a watermark and carousel chevrons off the current clip —
+pass `--crop none` for footage that doesn't need it. The script requires ffmpeg
+(`brew install ffmpeg`); it is an authoring step, not part of the build, and the
+encoded files are committed.
+
+Both outputs are muted, audio-free, and `+faststart` so playback begins before
+the file has finished downloading.
+
 ### Moving to a custom domain later
 
 1. Create `public/CNAME` containing just the domain, e.g. `slayedbybedoya.com`.
