@@ -105,14 +105,14 @@ export function BridalExperience({ showSecondaryCta = true }: BridalExperiencePr
                 eventParams={{ location: "bridal_experience" }}
                 className="!bg-ivory !text-ink hover:!bg-nude"
               />
-              {showSecondaryCta ? (
+              {/* {showSecondaryCta ? (
                 <Link
                   href="/bridal"
                   className="link-rule !text-ivory !border-ivory/40 hover:!border-champagne hover:!text-champagne"
                 >
                   Explore Bridal Services
                 </Link>
-              ) : null}
+              ) : null} */}
             </Reveal>
           </div>
         </div>
