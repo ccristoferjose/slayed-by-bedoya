@@ -53,16 +53,16 @@ export default function AboutPage() {
 
               <div className="measure mt-8 space-y-5 text-base leading-relaxed text-espresso/85">
                 <p>
-                  I&apos;m a makeup artist working in {site.location}. Most of what I do
-                  is bridal, quinceañeras, and the events in between — plus
-                  editorial and production work, and teaching clients to do their
-                  own makeup properly.
+                  I&apos;m a makeup artist based in Westchester, New York, serving Westchester 
+                  and surrounding areas. Most of what I do is bridal, quinceañeras, and special events, 
+                  alongside editorial and production work and teaching clients how to do their own makeup with confidence.
+
                 </p>
                 <p>
-                  I don&apos;t have a signature look I put on everyone. What I have is a
-                  way of working: figure out what the face in front of me is
-                  actually doing, what the day demands, and what the person wants
-                  to feel like — then build to that.
+                  I don&apos;t have a signature look that I put on everyone. What I have is a way of working: 
+                  understanding the face in front of me, what the day demands, and how the person wants 
+                  to feel — then building the makeup around that.
+
                 </p>
                 <p>
                   A lot of the job is listening. &ldquo;Natural&rdquo; means something
