@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { site, instagramUrl } from "@/lib/site";
 import { whatsappMessages } from "@/lib/whatsapp";
+import { createMailtoUrl } from "@/lib/email";
 import { pageMetadata } from "@/lib/metadata";
 import { Container } from "@/components/ui/Container";
 import { SectionLabel } from "@/components/ui/SectionLabel";
@@ -60,7 +61,7 @@ export default function ContactPage() {
                   <dt className="label">Email</dt>
                   <dd>
                     <a
-                      href={`mailto:${site.email}`}
+                      href={createMailtoUrl()}
                       className="font-display text-xl font-light transition-colors hover:text-burgundy"
                     >
                       {site.email}

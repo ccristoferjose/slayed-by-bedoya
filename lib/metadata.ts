@@ -100,6 +100,7 @@ export function businessJsonLd() {
     url: site.url,
     image: `${site.url}/images/og-image.jpg`,
     areaServed: site.location,
+    ...(site.email ? { email: site.email } : {}),
     address: { "@type": "PostalAddress", addressLocality: site.location },
     sameAs: [`https://instagram.com/${site.instagramHandle}`],
     makesOffer: [
