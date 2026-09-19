@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { site, instagramUrl } from "@/lib/site";
+import { createMailtoUrl } from "@/lib/email";
 import { whatsappMessages } from "@/lib/whatsapp";
 import { Container } from "@/components/ui/Container";
 import { WhatsAppButton } from "@/components/ui/WhatsAppButton";
@@ -58,7 +59,7 @@ export function Footer() {
               className="!text-[0.6875rem] !tracking-[0.22em] !text-taupe hover:!text-burgundy"
             />
             {site.email ? (
-              <a href={`mailto:${site.email}`} className="label hover:text-burgundy">
+              <a href={createMailtoUrl()} className="label hover:text-burgundy">
                 Email
               </a>
             ) : null}
