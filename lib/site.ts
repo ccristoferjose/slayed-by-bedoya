@@ -38,8 +38,8 @@ export const site = {
   /** Displayed service area. PLACEHOLDER */
   location: env(process.env.NEXT_PUBLIC_LOCATION, "New York, NY"),
 
-  /** Optional. Leave empty and the email link is simply not rendered. */
-  email: env(process.env.NEXT_PUBLIC_CONTACT_EMAIL, ""),
+  /** Secondary contact. Leave empty and every email link is simply not rendered. */
+  email: env(process.env.NEXT_PUBLIC_CONTACT_EMAIL, "slayedbybedoya@gmail.com"),
 
   /** Canonical origin, used for metadata and the sitemap. */
   url: env(process.env.NEXT_PUBLIC_SITE_URL, "https://slayedbybedoya.com"),
