@@ -7,7 +7,7 @@ export const imageManifest: Record<string, readonly number[]> = {
   "/images/about-bts-01.jpg": [256, 384, 640, 828, 1080, 1086],
   "/images/about-bts-02.jpg": [256, 384, 640, 828, 1020],
   "/images/about-portrait.jpg": [256, 384, 640, 828, 1080, 1254],
-  "/images/artist-portrait.jpg": [256, 384, 640, 828, 1080, 1254],
+  "/images/artist-portrait.jpg": [256, 384, 640, 828, 1024],
   "/images/bridal-experience.jpg": [256, 384, 640, 828, 1080, 1122],
   "/images/bridal-hero.jpg": [256, 384, 640, 828, 1080, 1440, 1920],
   "/images/bridal-intro.jpg": [256, 384, 640, 828, 1080, 1200],
