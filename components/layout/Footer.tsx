@@ -14,6 +14,13 @@ const footerNav = [
   { label: "FAQ", href: "/faq" },
 ];
 
+/** Site credit — goes straight to the developer, not to the business inbox in `site.email`. */
+const developerMailtoUrl = `mailto:chris.chitay@gmail.com?subject=${encodeURIComponent(
+  "Website inquiry — via Slayed by Bedoya",
+)}&body=${encodeURIComponent(
+  "Hi Christtopher,\n\nI saw your work on the Slayed by Bedoya website and I'd like to talk about a project.\n\nName:\nBusiness / project:\nWhat I need:\n\nThanks!",
+)}`;
+
 export function Footer() {
   return (
     <footer className="border-t border-ink/10 bg-cream">
@@ -75,9 +82,17 @@ export function Footer() {
           </div>
         </div>
 
-        <p className="mt-8 text-xs text-taupe">
-          © {new Date().getFullYear()} {site.name}. All rights reserved.
-        </p>
+        <div className="mt-8 flex flex-col gap-2 text-xs text-taupe sm:flex-row sm:items-center sm:justify-between">
+          <p>
+            © {new Date().getFullYear()} {site.name}. All rights reserved.
+          </p>
+          <p>
+            Powered by Christtopher Chitay ·{" "}
+            <a href={developerMailtoUrl} className="underline-offset-2 hover:text-burgundy hover:underline">
+              Contact
+            </a>
+          </p>
+        </div>
       </Container>
     </footer>
   );
